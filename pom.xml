@@ -58,6 +58,7 @@
     <mavenVersion>3.6.2</mavenVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <quarkus.package.type>uber-jar</quarkus.package.type>
     <skipITs>true</skipITs>
     <version.com.dkanejs.maven.plugins.docker-compose-maven-plugin>4.0.0</version.com.dkanejs.maven.plugins.docker-compose-maven-plugin>
     <version.com.github.eirslett>1.9.1</version.com.github.eirslett>

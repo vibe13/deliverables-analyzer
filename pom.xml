@@ -95,7 +95,7 @@
     <version.org.infinispan>12.1.7.Final</version.org.infinispan>
     <version.org.jacoco>0.8.7</version.org.jacoco>
     <version.org.jboss.pnc.build.finder>2.0.1-SNAPSHOT</version.org.jboss.pnc.build.finder>
-    <version.org.jboss.pnc.pnc-api>2.1.0</version.org.jboss.pnc.pnc-api>
+    <version.org.jboss.pnc.pnc-api>2.2.0-SNAPSHOT</version.org.jboss.pnc.pnc-api>
     <version.org.jboss.resteasy>4.7.1.Final</version.org.jboss.resteasy>
   </properties>
 
@@ -197,6 +197,10 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.slf4j</groupId>
+      <artifactId>slf4j-jboss-logmanager</artifactId>
     </dependency>
     <dependency>
       <groupId>org.infinispan</groupId>

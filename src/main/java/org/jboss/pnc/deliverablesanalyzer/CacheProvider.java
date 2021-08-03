@@ -36,6 +36,7 @@ import org.infinispan.manager.DefaultCacheManager;
 import org.jboss.pnc.build.finder.core.BuildConfig;
 import org.jboss.pnc.build.finder.core.ChecksumType;
 import org.jboss.pnc.build.finder.core.ConfigDefaults;
+import org.jboss.pnc.build.finder.core.LocalFile;
 import org.jboss.pnc.build.finder.koji.KojiBuild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,15 +94,17 @@ public class CacheProvider {
             throw new IOException("Cache location is not writable: " + locationPath);
         }
 
-        KojiBuild.KojiBuildExternalizer externalizer = new KojiBuild.KojiBuildExternalizer();
+        KojiBuild.KojiBuildExternalizer kojiBuildExternalizer = new KojiBuild.KojiBuildExternalizer();
+        LocalFile.LocalFileExternalizer localFileExternalizer = new LocalFile.LocalFileExternalizer();
         GlobalConfigurationChildBuilder globalConfig = new GlobalConfigurationBuilder();
 
         globalConfig.globalState()
                 .persistentLocation(location)
                 .serialization()
                 .marshaller(new GenericJBossMarshaller())
-                .addAdvancedExternalizer(externalizer.getId(), externalizer)
-                .whiteList()
+                .addAdvancedExternalizer(kojiBuildExternalizer.getId(), kojiBuildExternalizer)
+                .addAdvancedExternalizer(localFileExternalizer.getId(), localFileExternalizer)
+                .allowList()
                 .addRegexp(".*")
                 .create();
 

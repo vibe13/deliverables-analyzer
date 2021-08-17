@@ -17,6 +17,7 @@ package org.jboss.pnc.deliverablesanalyzer.model;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -102,8 +103,8 @@ public class FinderResult {
 
     private static void setCommonArtifactFields(Artifact.ArtifactBuilder builder, KojiLocalArchive archive) {
         KojiArchiveInfo archiveInfo = archive.getArchive();
-        long size = archiveInfo.getSize() == null ? -1 : archiveInfo.getSize(); // TODO after NCL-6230 don't default to
-                                                                                // -1, use what's given
+        long size = archiveInfo.getSize();
+
         builder.filename(archiveInfo.getFilename()).size(size);
 
         for (Checksum checksum : archive.getChecksums()) {
@@ -136,12 +137,23 @@ public class FinderResult {
         return NPMArtifact.builder().name(archiveInfo.getArtifactId()).version(archiveInfo.getVersion());
     }
 
-    private static Artifact createNotFoundArtifact(KojiLocalArchive localArchive) {
-        Artifact.ArtifactBuilder<?, ?> builder = Artifact.builder().builtFromSource(false);
+    private static Collection<Artifact> createNotFoundArtifacts(KojiLocalArchive localArchive) {
+        Collection<Artifact> artifacts = new ArrayList<>();
 
-        setCommonArtifactFields(builder, localArchive);
+        if (localArchive.getFilenames() == null || localArchive.getFilenames().isEmpty()) {
+            throw new IllegalArgumentException("Filename for not-found artifact is missing. " + localArchive);
+        }
 
-        return builder.build();
+        for (String filename : localArchive.getFilenames()) {
+            Artifact.ArtifactBuilder<?, ?> builder = Artifact.builder().builtFromSource(false);
+            localArchive.getArchive().setFilename(filename);
+
+            setCommonArtifactFields(builder, localArchive);
+
+            artifacts.add(builder.build());
+        }
+
+        return artifacts;
     }
 
     private static Set<Artifact> getNotFoundArtifacts(Map<BuildSystemInteger, KojiBuild> builds) {
@@ -163,11 +175,10 @@ public class FinderResult {
         int archiveCount = 0;
 
         for (KojiLocalArchive localArchive : localArchives) {
-            Artifact artifact = createNotFoundArtifact(localArchive);
+            Collection<Artifact> notFoundArtifacts = createNotFoundArtifacts(localArchive);
+            artifacts.addAll(notFoundArtifacts);
 
-            artifacts.add(artifact);
-
-            archiveCount++;
+            archiveCount += notFoundArtifacts.size();
 
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Not found artifact: {} / {} ({})", archiveCount, numArchives, localArchive.getFilenames());

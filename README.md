@@ -55,6 +55,22 @@ To build with Maven and run the tests:
 $ mvn -Ddistribution.url=<url> clean install
 ```
 
+## Configuration
+
+Deliverables Analyzer can be configured by setting the various configuration
+keys listed below. They can be defined by setting the configuration key in:
+
+- system property (`-Dkey=value`)
+- environment variable
+- `.env` file in the working directory
+- `application.properties` file
+
+|Configuration Key|Description|Example|
+|-----------------|-----------|-------|
+|koji.hub.url|The Koji Hub URL to find builds|http://brewhub.localhost/brewhub|
+|koji.web.url|The Koji Web URL|http://brewweb.localhost/brew|
+|pnc.url|The PNC URL to find builds|http://pnc.localhost|
+
 ## Creating Docker Images with Docker Compose
 
 To also build the Docker image, add `-Pdocker` to the `mvn` arguments.

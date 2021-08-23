@@ -58,6 +58,7 @@ public class ConfigProvider {
             config = defaults != null ? defaults : new BuildConfig();
         }
 
+        // set config values if defined in java system property (-D) or via env variable or application.properties
         setKojiHubURL(config);
         setKojiWebURL(config);
         setPncURL(config);
@@ -68,6 +69,14 @@ public class ConfigProvider {
         config.setOutputDirectory(tmpDir.toAbsolutePath().toString());
     }
 
+    /**
+     * Override koji hub url in the config if 'koji.hub.url' defined in a system property, env variable, or in
+     * application.properties.
+     *
+     * @param config config file to potentially override its kojiHubUrl
+     *
+     * @throws IOException if we can't parse the value as an URL
+     */
     private void setKojiHubURL(BuildConfig config) throws IOException {
         Optional<String> optionalKojiHubURL = org.eclipse.microprofile.config.ConfigProvider.getConfig()
                 .getOptionalValue("koji.hub.url", String.class);
@@ -84,6 +93,14 @@ public class ConfigProvider {
         }
     }
 
+    /**
+     * Override koji web url in the config if 'koji.web.url' defined in a system property, env variable, or in
+     * application.properties. Otherwise, use kojiHubUrl to generate the kojiWebUrl.
+     *
+     * @param config config file to potentially override its kojiWebUrl
+     *
+     * @throws IOException if we can't parse the value as an URL
+     */
     private void setKojiWebURL(BuildConfig config) throws IOException {
         Optional<String> optionalKojiWebURL = org.eclipse.microprofile.config.ConfigProvider.getConfig()
                 .getOptionalValue("koji.web.url", String.class);
@@ -110,6 +127,14 @@ public class ConfigProvider {
         }
     }
 
+    /**
+     * Override pnc url in the config if 'pnc.url' defined in a system property, env variable, or in
+     * application.properties.
+     *
+     * @param config config file to potentially override its pncUrl
+     *
+     * @throws IOException if we can't parse the value as an URL
+     */
     private void setPncURL(BuildConfig config) throws IOException {
         Optional<String> optionalPncURL = org.eclipse.microprofile.config.ConfigProvider.getConfig()
                 .getOptionalValue("pnc.url", String.class);

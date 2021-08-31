@@ -36,7 +36,7 @@ import javax.inject.Provider;
 
 import org.apache.commons.collections4.MultiValuedMap;
 import org.eclipse.microprofile.context.ManagedExecutor;
-import org.infinispan.manager.DefaultCacheManager;
+import org.infinispan.commons.api.BasicCacheContainer;
 import org.jboss.pnc.build.finder.core.BuildConfig;
 import org.jboss.pnc.build.finder.core.BuildFinder;
 import org.jboss.pnc.build.finder.core.BuildFinderListener;
@@ -59,7 +59,7 @@ import com.redhat.red.build.koji.KojiClientException;
 public class Finder {
     private static final Logger LOGGER = LoggerFactory.getLogger(Finder.class);
 
-    private DefaultCacheManager cacheManager;
+    private BasicCacheContainer cacheManager;
 
     private Map<String, CancelWrapper> runningOperations = new ConcurrentHashMap<>();
 
@@ -70,7 +70,7 @@ public class Finder {
     BuildConfig config;
 
     @Inject
-    Provider<DefaultCacheManager> cacheProvider;
+    Provider<BasicCacheContainer> cacheProvider;
 
     @Inject
     ManagedExecutor pool;
@@ -85,7 +85,7 @@ public class Finder {
     public void init() {
         if (Boolean.FALSE.equals(config.getDisableCache())) {
             cacheManager = cacheProvider.get();
-            LOGGER.info("Initialized cache {}", cacheManager.getName());
+            LOGGER.info("Initialized cache {}", cacheManager);
         } else {
             LOGGER.info("Cache disabled");
         }
@@ -209,7 +209,7 @@ public class Finder {
                 "Starting distribution analysis for {} with config {} and cache manager {}",
                 files,
                 config,
-                cacheManager != null ? cacheManager.getName() : "disabled");
+                cacheManager != null ? cacheManager : "disabled");
 
         DistributionAnalyzer analyzer = new DistributionAnalyzer(files, config, cacheManager);
         analyzer.setListener(distributionAnalyzerListener);

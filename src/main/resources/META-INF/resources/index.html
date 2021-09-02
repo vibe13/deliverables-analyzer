@@ -70,6 +70,19 @@
     </style>
     <script>
       $(function() {
+
+        // wrapper around jQuery.ajax to be able to POST JSON data
+        $.postJSON = function(url, data, callback) {
+          return $.ajax({
+            'type': 'POST',
+            'url': url,
+            'contentType': 'application/json; charset=utf-8',
+            'data': JSON.stringify(data),
+            'dataType': 'json',
+            'success': callback
+          });
+        };
+
         prettyPrint();
 
         const version = $('#version');
@@ -149,13 +162,13 @@
           input.attr('disabled', true);
           submitButton.attr('disabled', true).text('Analyzing...');
 
-          const args = { url: u.toString() };
+          const args = { urls: u.toString().split(',').map(item => item.trim()) };
 
           if (config != null && config.val().length > 0) {
             args.config = config.val();
           }
 
-          $.post('/api/analyze', args, function(data, textStatus, jqXHR) {
+          $.postJSON('/api/analyze', args, function(data, textStatus, jqXHR) {
             const location = jqXHR.getResponseHeader('Location');
 
             if (location == null) {
@@ -343,7 +356,7 @@
       <div class="form-container">
         <form id="analyzeForm" class="form-horizontal">
           <div class="form-group">
-            <label for="url">URL</label><input id="url" class="form-control input-lg" type="text" />
+            <label for="url">URLs (comma separated)</label><input id="url" class="form-control input-lg" type="text" />
             <label for="config">Config</label>
             <details>
               <summary>Example</summary>

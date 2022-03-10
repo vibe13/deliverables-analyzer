@@ -19,7 +19,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -40,6 +43,7 @@ import org.jboss.pnc.deliverablesanalyzer.Finder;
 import org.jboss.pnc.deliverablesanalyzer.StatusCache;
 import org.jboss.pnc.deliverablesanalyzer.model.AnalyzeResponse;
 import org.jboss.pnc.deliverablesanalyzer.model.FinderStatus;
+import org.jboss.pnc.deliverablesanalyzer.utils.MdcUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +102,8 @@ public class AnalyzeResource implements AnalyzeService {
             heartbeatScheduler.subscribeRequest(id, analyzePayload.getHeartbeat());
         }
 
+        // add any mdc values from request to the callback if needed
+        mergeHttpHeaders(analyzePayload.getCallback(), MdcUtils.mdcToMapWithHeaderKeys());
         executor.runAsync(() -> {
             LOGGER.info("Analysis with ID {} was initiated. Starting analysis of these URLs: {}", id, urls);
             AnalysisReport analysisReport = null;
@@ -180,5 +186,25 @@ public class AnalyzeResource implements AnalyzeService {
         }
 
         return specificConfig;
+    }
+
+    /**
+     * Given a request and a map of http headers, add the http headers to the request if not already in the request
+     *
+     * @param request
+     * @param httpHeaders
+     */
+    private static void mergeHttpHeaders(Request request, Map<String, String> httpHeaders) {
+
+        List<Request.Header> callbackHeaders = request.getHeaders();
+        Set<String> existingHeaderKeys = callbackHeaders.stream()
+                .map(Request.Header::getName)
+                .collect(Collectors.toSet());
+
+        for (Map.Entry<String, String> entry : httpHeaders.entrySet()) {
+            if (!existingHeaderKeys.contains(entry.getKey())) {
+                callbackHeaders.add(new Request.Header(entry.getKey(), entry.getValue()));
+            }
+        }
     }
 }

@@ -130,8 +130,8 @@ public class AnalyzerResourceTestWithDummyBrew extends AnalyzeResourceTestAbstra
 
         // when
         // Start analysis
-        Response response = given()
-                .body(new AnalyzePayload("1234", List.of(stubThreeArtsZip(15000)), null, callbackRequest, heartbeatRequest))
+        Response response = given().body(
+                new AnalyzePayload("1234", List.of(stubThreeArtsZip(15000)), null, callbackRequest, heartbeatRequest))
                 .contentType(APPLICATION_JSON)
                 .when()
                 .post(analyzeUrl)
@@ -154,7 +154,8 @@ public class AnalyzerResourceTestWithDummyBrew extends AnalyzeResourceTestAbstra
         wiremock.stubFor(post(urlEqualTo(callbackRelativePath)).willReturn(aResponse().withStatus(HTTP_OK)));
 
         // when
-        analyzeResource.analyze(new AnalyzePayload("1234", List.of("xxyy:/malformedUrl.zip"), null, callbackRequest, null));
+        analyzeResource
+                .analyze(new AnalyzePayload("1234", List.of("xxyy:/malformedUrl.zip"), null, callbackRequest, null));
 
         // then
         verifyCallback(

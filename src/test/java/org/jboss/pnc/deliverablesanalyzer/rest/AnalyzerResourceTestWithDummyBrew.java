@@ -33,11 +33,13 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 
 import org.jboss.pnc.api.deliverablesanalyzer.dto.AnalyzePayload;
+import org.jboss.pnc.api.dto.HeartbeatConfig;
 import org.jboss.pnc.api.dto.Request;
 import org.jboss.pnc.build.finder.koji.ClientSession;
 import org.jboss.pnc.deliverablesanalyzer.model.AnalyzeResponse;
@@ -126,12 +128,13 @@ public class AnalyzerResourceTestWithDummyBrew extends AnalyzeResourceTestAbstra
         // Setup handler for heartbeat
         String heartbeatPath = "/heartbeat";
         Request heartbeatRequest = new Request(GET, new URI(baseUrl + heartbeatPath));
+        HeartbeatConfig heartbeatConfig = new HeartbeatConfig(heartbeatRequest, 100L, TimeUnit.MILLISECONDS);
         wiremock.stubFor(get(urlEqualTo(heartbeatPath)).willReturn(aResponse().withStatus(HTTP_OK)));
 
         // when
         // Start analysis
         Response response = given().body(
-                new AnalyzePayload("1234", List.of(stubThreeArtsZip(15000)), null, callbackRequest, heartbeatRequest))
+                new AnalyzePayload("1234", List.of(stubThreeArtsZip(15000)), null, callbackRequest, heartbeatConfig))
                 .contentType(APPLICATION_JSON)
                 .when()
                 .post(analyzeUrl)

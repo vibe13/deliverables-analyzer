@@ -33,11 +33,11 @@ public final class MdcUtils {
     }
 
     /**
-     * TODO: what to do with exceptions
+     * Populate the result map with mdc keys and values if present
      *
-     * @param result
-     * @param mdcMap
-     * @param mdcHeaderKeys
+     * @param result map where the mdc keys and values are put
+     * @param mdcMap original mdc map from MDC
+     * @param mdcHeaderKeys keys to add to the result map if present
      */
     public static void putMdcToResultMap(
             Map<String, String> result,
@@ -48,8 +48,6 @@ public final class MdcUtils {
         }
         if (mdcMap.get(mdcHeaderKeys.getMdcKey()) != null) {
             result.put(mdcHeaderKeys.getHeaderName(), mdcMap.get(mdcHeaderKeys.getMdcKey()));
-        } else {
-            throw new RuntimeException("Missing MDC value " + mdcHeaderKeys.getMdcKey());
         }
     }
 

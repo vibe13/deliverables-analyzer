@@ -126,6 +126,8 @@ public class Finder {
         CancelWrapper cancelWrapper = new CancelWrapper();
         runningOperations.put(id, cancelWrapper);
 
+        // Capture all the futures used in the find method. This is used for the cancel operation
+        List<Future> allTasks = new ArrayList<>();
         List<Future<FinderResult>> submittedTasks = urls.stream().map(url -> executor.submit(() -> {
             LOGGER.debug("Analysis of URL {} started.", url);
 
@@ -135,7 +137,8 @@ public class Finder {
                         URI.create(url).normalize().toURL(),
                         distributionAnalyzerListener,
                         buildFinderListener,
-                        config);
+                        config,
+                        allTasks);
 
                 LOGGER.debug("Analysis of URL {} finished.", url);
 
@@ -144,9 +147,10 @@ public class Finder {
                 throw new ExecutionException(e);
             }
         })).collect(Collectors.toList());
+        allTasks.addAll(submittedTasks);
 
         try {
-            return awaitResults(submittedTasks, cancelWrapper);
+            return awaitResults(submittedTasks, allTasks, cancelWrapper);
         } catch (CancellationException e) {
             LOGGER.debug("Analysis {} was cancelled", id, e);
             throw e;
@@ -158,8 +162,10 @@ public class Finder {
         }
     }
 
-    private List<FinderResult> awaitResults(List<Future<FinderResult>> submittedTasks, CancelWrapper cancelWrapper)
-            throws CancellationException, ExecutionException {
+    private List<FinderResult> awaitResults(
+            List<Future<FinderResult>> submittedTasks,
+            List<Future> allTasks,
+            CancelWrapper cancelWrapper) throws CancellationException, ExecutionException {
         List<FinderResult> results = new ArrayList<>(submittedTasks.size());
 
         int total = submittedTasks.size();
@@ -186,8 +192,9 @@ public class Finder {
             it = submittedTasks.iterator();
 
             if (cancelWrapper.isCancelled()) {
-                LOGGER.info("Cancelling all remaining tasks: {}", submittedTasks.size());
-                it.forEachRemaining(f -> f.cancel(true));
+                LOGGER.info("Cancelling all remaining tasks: {}", allTasks.size());
+                // cancel all remaining running futures
+                allTasks.stream().filter(future -> !future.isDone()).forEach(future -> future.cancel(true));
                 LOGGER.info("All remaining tasks were cancelled");
                 throw new CancellationException("Operation was cancelled manually");
             }
@@ -196,12 +203,25 @@ public class Finder {
         return results;
     }
 
+    /**
+     * @param id ID of the analysis
+     * @param url url to analyze
+     * @param distributionAnalyzerListener A listener for events from DistributionAnalyzer
+     * @param buildFinderListener A listener for events from Build Finder
+     * @param config Configuration of the analysis
+     * @param allTasks list of all futures used in the public find method. Used to add future created in the method to
+     *        it
+     *
+     * @return results of the analysis
+     * @throws KojiClientException Thrown in case of exceptions with Koji communication
+     */
     private FinderResult find(
             String id,
             URL url,
             DistributionAnalyzerListener distributionAnalyzerListener,
             BuildFinderListener buildFinderListener,
-            BuildConfig config) throws KojiClientException {
+            BuildConfig config,
+            List<Future> allTasks) throws KojiClientException {
         FinderResult result;
 
         List<String> files = Collections.singletonList(url.toExternalForm());
@@ -216,7 +236,8 @@ public class Finder {
         analyzer.setListener(distributionAnalyzerListener);
 
         Future<Map<ChecksumType, MultiValuedMap<String, LocalFile>>> futureChecksum = pool.submit(analyzer);
-        result = findBuilds(id, url, analyzer, futureChecksum, buildFinderListener);
+        allTasks.add(futureChecksum);
+        result = findBuilds(id, url, analyzer, futureChecksum, buildFinderListener, allTasks);
 
         LOGGER.info("Done finding builds for {}", url);
 
@@ -235,12 +256,25 @@ public class Finder {
         return result;
     }
 
+    /**
+     *
+     * @param id ID of the analysis
+     * @param url url to analyze
+     * @param analyzer DistributionAnalyzer object for checking checksum of files
+     * @param futureChecksum future containing results of checksum values from analyzer
+     * @param buildFinderListener A listener for events from Build Finder
+     * @param allTasks list of all futures used in the public find method. Used to add future created in the method to
+     *        it
+     * @return results of the analysis
+     * @throws KojiClientException Thrown in case of exceptions with Koji communication
+     */
     private FinderResult findBuilds(
             String id,
             URL url,
             DistributionAnalyzer analyzer,
             Future<Map<ChecksumType, MultiValuedMap<String, LocalFile>>> futureChecksum,
-            BuildFinderListener buildFinderListener) throws KojiClientException {
+            BuildFinderListener buildFinderListener,
+            List<Future> allTasks) throws KojiClientException {
 
         URL pncURL = config.getPncURL();
 
@@ -258,6 +292,7 @@ public class Finder {
             buildFinder.setListener(buildFinderListener);
 
             Future<Map<BuildSystemInteger, KojiBuild>> futureBuilds = pool.submit(buildFinder);
+            allTasks.add(futureBuilds);
 
             try {
                 Map<ChecksumType, MultiValuedMap<String, LocalFile>> checksums = futureChecksum.get();

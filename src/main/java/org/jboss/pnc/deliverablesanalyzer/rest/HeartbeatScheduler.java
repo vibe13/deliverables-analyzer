@@ -41,7 +41,9 @@ public class HeartbeatScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HeartbeatScheduler.class);
 
-    private final ScheduledExecutorService executor = new MDCScheduledThreadPoolExecutor(1, new NamedThreadFactory("heartbeat"));
+    private final ScheduledExecutorService executor = new MDCScheduledThreadPoolExecutor(
+            1,
+            new NamedThreadFactory("heartbeat"));
 
     @Inject
     HttpClient httpClient;

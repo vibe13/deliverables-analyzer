@@ -103,7 +103,9 @@ public class AnalyzeResource implements AnalyzeService {
         }
 
         // add any mdc values from request to the callback if needed
-        mergeHttpHeaders(analyzePayload.getCallback(), MdcUtils.mdcToMapWithHeaderKeys());
+        if (analyzePayload.getCallback() != null) {
+            mergeHttpHeaders(analyzePayload.getCallback(), MdcUtils.mdcToMapWithHeaderKeys());
+        }
         executor.runAsync(() -> {
             LOGGER.info("Analysis with ID {} was initiated. Starting analysis of these URLs: {}", id, urls);
             AnalysisReport analysisReport = null;

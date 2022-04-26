@@ -240,19 +240,6 @@ public class Finder {
         result = findBuilds(id, url, analyzer, futureChecksum, buildFinderListener, allTasks);
 
         LOGGER.info("Done finding builds for {}", url);
-
-        // TODO fix cleanup. It must:
-        // - support cancel
-        // - not affect running operations
-        // - run async
-        // Consider using dir/id{8}-urlHash{8}
-        /*
-         * boolean isClean = cleaner.cleanup(this.config.getOutputDirectory());
-         *
-         * if (isClean) { LOGGER.info("Cleanup after finding URL: {}", url); } else {
-         * LOGGER.warn("Cleanup failed after finding URL: {}", url); }
-         */
-
         return result;
     }
 

@@ -19,12 +19,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.pnc.api.constants.MDCHeaderKeys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
  * @author <a href="mailto:matejonnet@gmail.com">Matej Lazar</a>
  */
 public final class MdcUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MdcUtils.class);
 
     /**
      * Utility classes shouldn't have a public default constructor
@@ -48,6 +52,8 @@ public final class MdcUtils {
         }
         if (mdcMap.get(mdcHeaderKeys.getMdcKey()) != null) {
             result.put(mdcHeaderKeys.getHeaderName(), mdcMap.get(mdcHeaderKeys.getMdcKey()));
+        } else {
+            LOGGER.warn("MDC value {} missing", mdcHeaderKeys.getMdcKey());
         }
     }
 

@@ -38,6 +38,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.VerificationException;
+import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 
 /**
  * @author Jakub Bartecek
@@ -47,7 +48,8 @@ public class AnalyzeResourceTestAbstract {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(AnalyzeResourceTestAbstract.class);
 
-    protected final WireMockServer wiremock = new WireMockServer(options().port(PORT));
+    protected final WireMockServer wiremock = new WireMockServer(
+            options().port(PORT).notifier(new Slf4jNotifier(true)));
 
     protected final String callbackRelativePath = "/callback";
 

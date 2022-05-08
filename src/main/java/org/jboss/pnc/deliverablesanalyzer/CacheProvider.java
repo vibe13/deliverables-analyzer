@@ -170,7 +170,6 @@ public class CacheProvider {
 
         Configuration configuration = new org.infinispan.configuration.cache.ConfigurationBuilder().expiration()
                 .lifespan(config.getCacheLifespan())
-                .maxIdle(config.getCacheMaxIdle())
                 .wakeUpInterval(-1L)
                 .persistence()
                 .passivation(false)

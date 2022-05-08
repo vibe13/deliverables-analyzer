@@ -2,7 +2,7 @@
   "id" : "30014322-3311-4635-ba7d-876f65290b55",
   "name" : "pnc-rest_v2_artifacts",
   "request" : {
-    "url" : "/pnc-rest/v2/artifacts?pageSize=18&pageIndex=0&md5=7d4c14e2272407c640c8ff4353def961",
+    "url" : "/pnc-rest/v2/artifacts?pageSize=18&pageIndex=0&q=build%3Disnull%3Dfalse&md5=7d4c14e2272407c640c8ff4353def961",
     "method" : "GET"
   },
   "response" : {
@@ -16,6 +16,5 @@
   "uuid" : "30014322-3311-4635-ba7d-876f65290b55",
   "persistent" : true,
   "scenarioName" : "scenario-3-pnc-rest-v2-artifacts",
-  "requiredScenarioState" : "scenario-3-pnc-rest-v2-artifacts-2",
   "insertionIndex" : 5
 }

@@ -46,7 +46,7 @@ import io.restassured.response.Response;
  */
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AnalyzeResourceTestWithMockedBrew extends AnalyzeResourceTestAbstract {
+public class AnalyzeResourceWithMockedBrewTest extends AnalyzeResourceTestAbstract {
 
     @BeforeAll
     public void beforeAll() {
@@ -63,7 +63,7 @@ public class AnalyzeResourceTestWithMockedBrew extends AnalyzeResourceTestAbstra
         wiremock.resetAll();
     }
 
-    public AnalyzeResourceTestWithMockedBrew() throws URISyntaxException {
+    public AnalyzeResourceWithMockedBrewTest() throws URISyntaxException {
     }
 
     @Test

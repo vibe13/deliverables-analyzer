@@ -35,9 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
-
 import org.jboss.pnc.api.deliverablesanalyzer.dto.AnalyzePayload;
 import org.jboss.pnc.api.dto.HeartbeatConfig;
 import org.jboss.pnc.api.dto.Request;
@@ -189,9 +186,10 @@ public class AnalyzerResourceTestWithDummyBrew extends AnalyzeResourceTestAbstra
                                 containing("java.net.MalformedURLException: unknown protocol: xxyy"))));
     }
 
-    @Dependent
+    // TODO: this messes the AnalyzeResourceWithMockedBrewTest. we need to only inject this for this test alone !!!
+    // @Dependent
     public static class DummyKojiClientSessionProducer {
-        @Produces
+        // @Produces
         public ClientSession createClientSession() {
             LOGGER.info("Using alternate dummy Koji ClientSession");
             return new ClientSession() {

@@ -67,7 +67,7 @@
     <version.com.github.tomakehurs-wiremock-jre8>2.34.0</version.com.github.tomakehurs-wiremock-jre8>
     <version.com.mycila>4.1</version.com.mycila>
     <version.com.puppycrawl.tools>10.3.4</version.com.puppycrawl.tools>
-    <version.io.quarkus>2.13.0.Final</version.io.quarkus>
+    <version.io.quarkus>2.10.4.Final</version.io.quarkus>
     <version.net.revelc.code.formatter.formatter-maven-plugin>2.20.0</version.net.revelc.code.formatter.formatter-maven-plugin>
     <version.net.revelc.code.impsort-maven-plugin>1.7.0</version.net.revelc.code.impsort-maven-plugin>
     <version.net.sourceforge.pmd>6.49.0</version.net.sourceforge.pmd>
@@ -97,6 +97,7 @@
     <version.org.jboss.pnc.build.finder>2.0.1</version.org.jboss.pnc.build.finder>
     <version.org.jboss.pnc.pnc-api>2.4.0</version.org.jboss.pnc.pnc-api>
     <version.org.jboss.resteasy>6.2.0.Final</version.org.jboss.resteasy>
+    <version.org.sonatype.plugins.nexus-staging-maven-plugin>1.6.13</version.org.sonatype.plugins.nexus-staging-maven-plugin>
     <version.pnc.quarkus-logging-kafka>1.0.3</version.pnc.quarkus-logging-kafka>
   </properties>
 
@@ -547,6 +548,11 @@
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>${version.org.jacoco}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>${version.org.sonatype.plugins.nexus-staging-maven-plugin}</version>
         </plugin>
       </plugins>
     </pluginManagement>

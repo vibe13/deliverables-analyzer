@@ -549,17 +549,6 @@
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>${version.org.jacoco}</version>
         </plugin>
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>${version.org.sonatype.plugins.nexus-staging-maven-plugin}</version>
-          <extensions>true</extensions>
-          <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>false</autoReleaseAfterClose>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -763,6 +752,17 @@ limitations under the License.]]></inlineHeader>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>${version.org.sonatype.plugins.nexus-staging-maven-plugin}</version>
+        <extensions>true</extensions>
+        <configuration>
+            <serverId>ossrh</serverId>
+            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+        </configuration>
       </plugin>
     </plugins>
   </build>

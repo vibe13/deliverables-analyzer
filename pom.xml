@@ -78,6 +78,7 @@
     <version.org.apache.maven.plugins.maven-dependency-plugin>3.3.0</version.org.apache.maven.plugins.maven-dependency-plugin>
     <version.org.apache.maven.plugins.maven-deploy-plugin>3.0.0</version.org.apache.maven.plugins.maven-deploy-plugin>
     <version.org.apache.maven.plugins.maven-enforcer-plugin>3.1.0</version.org.apache.maven.plugins.maven-enforcer-plugin>
+    <version.org.apache.maven.plugins.maven-gpg-plugin>3.0.1</version.org.apache.maven.plugins.maven-gpg-plugin>
     <version.org.apache.maven.plugins.maven-install-plugin>3.0.1</version.org.apache.maven.plugins.maven-install-plugin>
     <version.org.apache.maven.plugins.maven-jar-plugin>3.3.0</version.org.apache.maven.plugins.maven-jar-plugin>
     <version.org.apache.maven.plugins.maven-javadoc-plugin>3.4.1</version.org.apache.maven.plugins.maven-javadoc-plugin>
@@ -428,6 +429,11 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.maven-gpg-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
           <version>${version.org.apache.maven.plugins.maven-install-plugin}</version>
         </plugin>
@@ -698,6 +704,16 @@ limitations under the License.]]></inlineHeader>
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagNameFormat>@{project.version}</tagNameFormat>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <releaseProfiles>empty-javadoc-jar,gpg-sign</releaseProfiles>
+          <stagingRepository>https://oss.sonatype.org/service/local/staging/deploy/maven2/</stagingRepository>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

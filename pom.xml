@@ -618,6 +618,10 @@ limitations under the License.]]></inlineHeader>
         <groupId>io.quarkus</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
         <version>${version.io.quarkus}</version>
+        <configuration>
+            <!-- needed to publish to maven central -->
+            <skipOriginalJarRename>true</skipOriginalJarRename>
+        </configuration>
         <executions>
           <execution>
             <goals>

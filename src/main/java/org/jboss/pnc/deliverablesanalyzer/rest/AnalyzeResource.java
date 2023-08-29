@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -46,6 +47,8 @@ import org.jboss.pnc.deliverablesanalyzer.model.FinderStatus;
 import org.jboss.pnc.deliverablesanalyzer.utils.MdcUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.quarkus.oidc.client.OidcClient;
 
 @ApplicationScoped
 public class AnalyzeResource implements AnalyzeService {
@@ -68,6 +71,9 @@ public class AnalyzeResource implements AnalyzeService {
 
     @Inject
     HttpClient httpClient;
+
+    @Inject
+    OidcClient oidcClient;
 
     @Context
     UriInfo uriInfo;
@@ -161,6 +167,7 @@ public class AnalyzeResource implements AnalyzeService {
 
     private boolean performCallback(org.jboss.pnc.api.dto.Request callback, AnalysisReport result) {
         try {
+            addAuthenticationHeaderToCallback(callback);
             httpClient.performHttpRequest(callback, result);
             return true;
         } catch (Exception e) {
@@ -227,4 +234,11 @@ public class AnalyzeResource implements AnalyzeService {
             }
         }
     }
+
+    private void addAuthenticationHeaderToCallback(org.jboss.pnc.api.dto.Request callback) {
+        String accessToken = oidcClient.getTokens().await().indefinitely().getAccessToken();
+        List<Request.Header> headers = callback.getHeaders();
+        headers.add(new Request.Header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken));
+    }
+
 }

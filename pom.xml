@@ -27,7 +27,7 @@
 
   <groupId>org.jboss.pnc.deliverablesanalyzer</groupId>
   <artifactId>deliverables-analyzer</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>1.2.0-SNAPSHOT</version>
 
   <name>Deliverables Analyzer</name>
   <description>Analyzes deliverables.</description>

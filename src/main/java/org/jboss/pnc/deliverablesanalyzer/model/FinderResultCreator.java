@@ -18,6 +18,7 @@ package org.jboss.pnc.deliverablesanalyzer.model;
 import static org.jboss.pnc.build.finder.core.BuildFinderUtils.isBuildIdZero;
 
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,12 +53,15 @@ public final class FinderResultCreator {
     }
 
     public static FinderResult createFinderResult(String id, URL url, Map<BuildSystemInteger, KojiBuild> builds) {
-        return FinderResult.builder()
+        FinderResult.Builder builder = FinderResult.builder()
                 .id(id)
                 .url(url)
                 .notFoundArtifacts(getNotFoundArtifacts(builds))
-                .builds(getFoundBuilds(builds))
-                .build();
+                .builds(getFoundBuilds(builds));
+
+        setUrlChecksums(builder, url, builds);
+
+        return builder.build();
     }
 
     private static void setCommonArtifactFields(Artifact.ArtifactBuilder builder, KojiLocalArchive archive) {
@@ -200,6 +204,41 @@ public final class FinderResultCreator {
                 .archiveUnmatchedFilenames(localArchive.getUnmatchedFilenames());
 
         return builder.build();
+    }
+
+    private static void setUrlChecksums(
+            FinderResult.Builder builder,
+            URL url,
+            Map<BuildSystemInteger, KojiBuild> builds) {
+
+        // Find the url filename
+        String filename = Paths.get(url.getPath()).getFileName().toString();
+        // Loop in the builds to find the local archive associated with the url
+        for (Map.Entry<BuildSystemInteger, KojiBuild> buildEntry : builds.entrySet()) {
+            List<KojiLocalArchive> localArchives = buildEntry.getValue().getArchives();
+            if (localArchives == null || localArchives.isEmpty()) {
+                return;
+            }
+            for (KojiLocalArchive localArchive : localArchives) {
+                if (localArchive.getFilenames().contains(filename)) {
+                    for (Checksum checksum : localArchive.getChecksums()) {
+                        switch (checksum.getType()) {
+                            case md5:
+                                builder.md5(checksum.getValue());
+                                break;
+                            case sha1:
+                                builder.sha1(checksum.getValue());
+                                break;
+                            case sha256:
+                                builder.sha256(checksum.getValue());
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static Set<Build> getFoundBuilds(Map<BuildSystemInteger, KojiBuild> builds) {

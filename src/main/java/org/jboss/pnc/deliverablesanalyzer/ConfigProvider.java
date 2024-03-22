@@ -28,6 +28,8 @@ import javax.enterprise.inject.Produces;
 
 import org.jboss.pnc.build.finder.core.BuildConfig;
 import org.jboss.pnc.build.finder.core.ConfigDefaults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -35,6 +37,8 @@ import org.jboss.pnc.build.finder.core.ConfigDefaults;
  */
 @ApplicationScoped
 public class ConfigProvider {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigProvider.class);
 
     private BuildConfig config;
 
@@ -48,15 +52,22 @@ public class ConfigProvider {
         File configFile = new File(
                 ConfigProvider.class.getClassLoader().getResource(ConfigDefaults.CONFIG_FILE).getFile());
 
+        LOGGER.debug("Found custom config file {}", configFile.getAbsolutePath());
+
         if (configFile.exists()) {
             if (defaults == null) {
+                LOGGER.debug("Default config is null, using custom config file");
                 config = BuildConfig.load(configFile);
             } else {
+                LOGGER.debug("Default config is not null, merging it with custom config file");
                 config = BuildConfig.merge(defaults, configFile);
             }
         } else {
+            LOGGER.debug("Custom config file not found, using default config!");
             config = defaults != null ? defaults : new BuildConfig();
         }
+
+        LOGGER.debug("Configuration: {}", config);
 
         // set config values if defined in java system property (-D) or via env variable or application.properties
         setKojiHubURL(config);

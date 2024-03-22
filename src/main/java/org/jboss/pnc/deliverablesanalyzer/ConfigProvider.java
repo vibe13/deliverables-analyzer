@@ -36,8 +36,6 @@ import org.jboss.pnc.build.finder.core.ConfigDefaults;
 @ApplicationScoped
 public class ConfigProvider {
 
-    private static final String DEFAULT_CONFIG_LOCATION = "./" + ConfigDefaults.CONFIG_FILE;
-    private final File configFile = new File(DEFAULT_CONFIG_LOCATION);
     private BuildConfig config;
 
     @Produces
@@ -47,6 +45,8 @@ public class ConfigProvider {
 
     public ConfigProvider() throws IOException {
         BuildConfig defaults = BuildConfig.load(ConfigProvider.class.getClassLoader());
+        File configFile = new File(
+                ConfigProvider.class.getClassLoader().getResource(ConfigDefaults.CONFIG_FILE).getFile());
 
         if (configFile.exists()) {
             if (defaults == null) {

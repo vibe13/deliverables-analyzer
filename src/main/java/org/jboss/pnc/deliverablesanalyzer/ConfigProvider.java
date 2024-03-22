@@ -15,10 +15,11 @@
  */
 package org.jboss.pnc.deliverablesanalyzer;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -27,7 +28,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 
 import org.jboss.pnc.build.finder.core.BuildConfig;
-import org.jboss.pnc.build.finder.core.ConfigDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 public class ConfigProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigProvider.class);
+    private static final String CONFIG_FILE = "custom_config.json";
 
     private BuildConfig config;
 
@@ -49,18 +50,23 @@ public class ConfigProvider {
 
     public ConfigProvider() throws IOException {
         BuildConfig defaults = BuildConfig.load(ConfigProvider.class.getClassLoader());
-        File configFile = new File(
-                ConfigProvider.class.getClassLoader().getResource(ConfigDefaults.CONFIG_FILE).getFile());
+        String customConfig = null;
 
-        LOGGER.debug("Found custom config file {}", configFile.getAbsolutePath());
+        try {
+            InputStream is = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE);
+            customConfig = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            LOGGER.debug("Found custom configuration: {}", customConfig);
+        } catch (IOException e) {
+            LOGGER.error("Could not read the custom configuration", e);
+        }
 
-        if (configFile.exists()) {
+        if (customConfig != null) {
             if (defaults == null) {
                 LOGGER.debug("Default config is null, using custom config file");
-                config = BuildConfig.load(configFile);
+                config = BuildConfig.load(customConfig);
             } else {
                 LOGGER.debug("Default config is not null, merging it with custom config file");
-                config = BuildConfig.merge(defaults, configFile);
+                config = BuildConfig.merge(defaults, customConfig);
             }
         } else {
             LOGGER.debug("Custom config file not found, using default config!");
